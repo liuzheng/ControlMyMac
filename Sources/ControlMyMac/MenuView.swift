@@ -41,13 +41,13 @@ struct MenuView: View {
 
     private var controls: some View {
         HStack(spacing: 8) {
-            Button(model.airflowStatus.phase == .stopped ? "启动" : "重启") {
+            Button(model.airflowStatus.phase == .stopped ? model.localized(.start) : model.localized(.restart)) {
                 model.airflowStatus.phase == .stopped ? model.startAirflow() : model.restartAirflow()
             }
             .disabled(model.airflowStatus.phase == .starting)
-            Button("停止") { model.stopAirflow() }.disabled(model.airflowStatus.phase == .stopped)
-            Button("打开") { model.openAirflow() }.disabled(!model.serviceOn)
-            Button("日志") { model.revealAirflowLogs() }
+            Button(model.localized(.stop)) { model.stopAirflow() }.disabled(model.airflowStatus.phase == .stopped)
+            Button(model.localized(.open)) { model.openAirflow() }.disabled(!model.serviceOn)
+            Button(model.localized(.logs)) { model.revealAirflowLogs() }
             Spacer()
         }
         .controlSize(.small)
@@ -60,9 +60,9 @@ struct MenuView: View {
                     .lineLimit(2).fixedSize(horizontal: false, vertical: true)
             }
             HStack {
-                SettingsLink { Text("设置…") }
+                SettingsLink { Text(model.localized(.settings)) }
                 Spacer()
-                Button("退出") { NSApp.terminate(nil) }
+                Button(model.localized(.quit)) { NSApp.terminate(nil) }
             }
             .controlSize(.small)
         }

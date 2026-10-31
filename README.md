@@ -12,7 +12,7 @@ Airflow LaunchAgent  ~/Library/LaunchAgents/com.liuzheng.controlmymac.airflow.pl
 UI LaunchAgent       ~/Library/LaunchAgents/com.liuzheng.controlmymac.ui.plist；登录时启动菜单栏应用
 ```
 
-Airflow 是独立受管服务。阶段一期间，菜单栏 App 还会在自身运行时托管一个用户私有 Unix Socket，用于接收 allow-listed 的本地操作请求；退出 App 会关闭该 socket，且不会启动独立 Broker、LaunchAgent 或 root Helper。旧版网卡 Rule、蓝牙 Focus、Wi‑Fi、统一监听对象及旧 `config.json` 的监听字段均已移除且不会执行。
+Airflow 是独立受管服务。菜单栏 App 只负责显示状态、控制 Airflow 生命周期、管理设置和查看日志。旧版网卡 Rule、蓝牙 Focus、Wi‑Fi、统一监听对象及旧 `config.json` 的监听字段均已移除且不会执行。
 
 ## 构建与安装
 
@@ -34,6 +34,10 @@ PIP_INDEX_URL=https://pypi.org/simple make install
 ```
 
 网络或依赖安装失败时，App 仍可能完成安装，但 Airflow 不可用。请检查 `~/.controlmymac/python-packages.status` 与下文的服务诊断文件，然后修正网络/索引并重新运行 `make install`。
+
+## Terminal 提权
+
+需要管理员权限时，请在 Terminal 中使用 `sudo`。不要把密码写入脚本、环境变量或日志，也不要使用 `sudo make`。`make install` 和 `make uninstall` 会在各自需要管理员权限的阶段通过 `sudo` 请求授权；`make build`、`make bundle` 必须以普通用户运行。
 
 ## 使用与服务生命周期
 
@@ -71,12 +75,6 @@ Airflow 的唯一 SimpleAuth 管理员账号是 `controlmymac`，角色为 `admi
 ## DAG
 
 DAG 需由用户自行放入 `~/Library/Application Support/ControlMyMac/dags/`。仓库中的 `dags_demo/wired_ethernet_inserted.py` 是可选示例，不会随安装自动复制；它不是已移除的内置网卡监听功能。详情见 [DAG 指南](docs/dags.md)。
-
-## 阶段一本地操作请求
-
-阶段一允许用户 DAG 在 ControlMyMac App 保持运行时，通过本地 Unix Socket 提交已注册的操作请求。App 在 Settings 中显示请求、经过 Touch ID 或系统密码认证后预览固定命令，并仅在用户再次确认时复制到剪贴板。它不会创建 `/tmp` 脚本、启动 Terminal、调用 `sudo`、自动执行网络配置或启动 root Helper。
-
-DAG 收到 `manual_execution_required` 表示命令已审核并复制，**不表示配置已经成功**。用户仍需自行在 Terminal 粘贴命令，并由 Terminal 的 `sudo` 密码完成最终系统授权。示例部署与排查见 [DAG 指南](docs/dags.md)。
 
 ## 验证与恢复
 

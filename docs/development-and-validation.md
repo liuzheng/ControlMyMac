@@ -45,8 +45,6 @@ lsof -nP -iTCP:50100 -sTCP:LISTEN
 
 最后一条命令应只显示 `127.0.0.1:50100`。还应在设置页确认：runtime 和依赖状态可见、服务就绪后可打开 Airflow、凭据仅在就绪时可显示/复制、保存日志保留天数会立即产生清理结果。
 
-阶段一的本地操作请求人工验证：保持 ControlMyMac App 打开，手动触发 `privileged_operation_demo`，在 Settings 审查请求并完成 Touch ID 或系统密码认证。核对命令预览后点击复制，确认 DAG 只收到 `manual_execution_required`；验证 App 没有创建 `/tmp` 脚本、启动 Terminal、调用 `sudo` 或执行网络配置。最后由用户决定是否在 Terminal 手动粘贴命令；此手动终端步骤不构成自动化验收成功。
-
 ## 修改边界
 
 - `Sources/ControlMyMacCore/` 包含路径、状态、服务控制、凭据读取和日志清理等可测试逻辑。
