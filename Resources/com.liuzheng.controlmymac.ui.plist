@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  登录时拉起菜单栏 App。走 /usr/bin/open 而不是直接跑二进制，
+  这样 LaunchServices 能正常注册这个 .app；open 自己随即退出，不需要 KeepAlive。
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.liuzheng.controlmymac.ui</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/open</string>
+		<string>-g</string>
+		<string>/Applications/ControlMyMac.app</string>
+	</array>
+
+	<key>RunAtLoad</key>
+	<true/>
+</dict>
+</plist>

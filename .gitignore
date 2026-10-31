@@ -1,0 +1,12 @@
+.build/
+build/
+*.pkg
+.DS_Store
+*.xcodeproj
+.swiftpm/
+
+# openspec
+.claude/
+.kiro/
+openspec/
+graphify-out
