@@ -1,6 +1,8 @@
 # 开发与验证
 
-ControlMyMac 是 macOS 14+ Swift Package，并在 App bundle 中携带 Python 3.14.7 runtime。以下命令均应从仓库根目录以普通用户运行。
+ControlMyMac 是 macOS 12+ Swift Package，最低工具链为 Swift 5.7（Xcode 14），并在 App bundle 中携带 Python 3.14.7 runtime。以下命令均应从仓库根目录以普通用户运行。
+
+菜单栏使用 AppKit 的 `NSStatusItem` / `NSPopover`，设置页使用独立的 `NSWindow`，均由 `NSHostingController` 承载 SwiftUI 内容。不要直接使用 macOS 13+ 的 `MenuBarExtra`、`Text.monospaced()` 或 macOS 14+ 的 `SettingsLink`、新版 `onChange` 重载，以免破坏 Monterey 兼容性。
 
 ## 构建
 
@@ -44,6 +46,8 @@ lsof -nP -iTCP:50100 -sTCP:LISTEN
 ```
 
 最后一条命令应只显示 `127.0.0.1:50100`。还应在设置页确认：runtime 和依赖状态可见、服务就绪后可打开 Airflow、凭据仅在就绪时可显示/复制、保存日志保留天数会立即产生清理结果。
+
+在 macOS 12 上还需检查：点击菜单栏图标可打开/关闭弹窗；点击弹窗外会关闭弹窗；“设置”会激活同一个设置窗口；关闭设置后菜单栏应用仍运行，重新打开设置正常；切换语言后两个界面及设置窗口标题更新；复制密码的反馈在设置窗口重新激活时清除。
 
 ## 修改边界
 

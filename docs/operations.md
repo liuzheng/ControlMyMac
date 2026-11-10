@@ -1,6 +1,6 @@
 # ControlMyMac 运维指南
 
-本文面向本机安装、更新、恢复和卸载 ControlMyMac 的管理员。应用仅支持 macOS 14+，并为当前登录用户管理本地 Airflow；不要以 root 身份构建项目。
+本文面向本机安装、更新、恢复和卸载 ControlMyMac 的管理员。应用支持 macOS 12+，并为当前登录用户管理本地 Airflow；不要以 root 身份构建项目。
 
 ## 安装与更新
 
@@ -43,19 +43,19 @@ make install
 
 ## 状态和日志位置
 
-| 路径 | 内容 |
-|---|---|
-| `~/Library/Application Support/ControlMyMac/dags/` | 用户 DAG；唯一受支持 DAG 目录 |
-| `~/Library/Application Support/ControlMyMac/airflow/airflow.cfg` | 自动生成的、带绝对路径的 Airflow 配置 |
-| `~/Library/Application Support/ControlMyMac/airflow/service-status.json` | 失败、启动和就绪状态的诊断 |
-| `~/Library/Application Support/ControlMyMac/airflow/simple-auth-passwords.json` | `controlmymac` SimpleAuth 密码；0600 |
-| `~/Library/Application Support/ControlMyMac/airflow/api-auth-jwt-secret.json` | 内部 execution API JWT；0600 |
-| `~/Library/Application Support/ControlMyMac/airflow/log-retention.json` | 日志保留天数；0600 |
-| `~/Library/Application Support/ControlMyMac/airflow/cleanup-status.json` | 最近日志清理结果 |
-| `~/Library/Logs/ControlMyMac/Airflow/service/YYYY-MM-DD/` | supervisor 的 `stdout.log`、`stderr.log` |
-| `~/Library/Logs/ControlMyMac/Airflow/tasks/YYYY-MM-DD/` | Airflow 任务日志 |
-| `~/Library/Logs/ControlMyMac/Airflow/maintenance/YYYY-MM-DD/` | 清理维护日志 |
-| `~/.controlmymac/python-packages.status` | 依赖安装/验证状态 |
+| 路径                                                                            | 内容                                     |
+| ------------------------------------------------------------------------------- | ---------------------------------------- |
+| `~/Library/Application Support/ControlMyMac/dags/`                              | 用户 DAG；唯一受支持 DAG 目录            |
+| `~/Library/Application Support/ControlMyMac/airflow/airflow.cfg`                | 自动生成的、带绝对路径的 Airflow 配置    |
+| `~/Library/Application Support/ControlMyMac/airflow/service-status.json`        | 失败、启动和就绪状态的诊断               |
+| `~/Library/Application Support/ControlMyMac/airflow/simple-auth-passwords.json` | `controlmymac` SimpleAuth 密码；0600     |
+| `~/Library/Application Support/ControlMyMac/airflow/api-auth-jwt-secret.json`   | 内部 execution API JWT；0600             |
+| `~/Library/Application Support/ControlMyMac/airflow/log-retention.json`         | 日志保留天数；0600                       |
+| `~/Library/Application Support/ControlMyMac/airflow/cleanup-status.json`        | 最近日志清理结果                         |
+| `~/Library/Logs/ControlMyMac/Airflow/service/YYYY-MM-DD/`                       | supervisor 的 `stdout.log`、`stderr.log` |
+| `~/Library/Logs/ControlMyMac/Airflow/tasks/YYYY-MM-DD/`                         | Airflow 任务日志                         |
+| `~/Library/Logs/ControlMyMac/Airflow/maintenance/YYYY-MM-DD/`                   | 清理维护日志                             |
+| `~/.controlmymac/python-packages.status`                                        | 依赖安装/验证状态                        |
 
 运行时 `airflow.cfg` 会在启动时重新生成，请勿将 bundle 中的 `conf/airflow.cfg.jinja2` 当作活动配置文件。
 

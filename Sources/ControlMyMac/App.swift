@@ -1,26 +1,92 @@
 import SwiftUI
 import AppKit
+import Combine
 import ControlMyMacCore
 
 @main
-struct ControlMyMacApp: App {
-    @StateObject private var model = AppModel()
-
-    var body: some Scene {
-        MenuBarExtra {
-            MenuView()
-                .environmentObject(model)
-                .environment(\.locale, model.locale)
-        } label: {
-            Image(nsImage: model.menuIcon)
+struct ControlMyMacApp {
+    static func main() {
+        let application = NSApplication.shared
+        let delegate = AppDelegate()
+        application.delegate = delegate
+        application.setActivationPolicy(.accessory)
+        withExtendedLifetime(delegate) {
+            application.run()
         }
-        .menuBarExtraStyle(.window)
+    }
+}
 
-        Settings {
-            SettingsView()
+/// AppKit hosts the SwiftUI views without requiring macOS 13's MenuBarExtra
+/// or macOS 14's SettingsLink. Keep one shared model and one settings window.
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    static let settingsWindowIdentifier = NSUserInterfaceItemIdentifier("ControlMyMac.settings")
+    private let model = AppModel()
+    private var statusItem: NSStatusItem?
+    private let popover = NSPopover()
+    private var settingsWindow: NSWindow?
+    private var subscriptions = Set<AnyCancellable>()
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem = item
+        item.button?.target = self
+        item.button?.action = #selector(togglePopover(_:))
+        updateStatusItem()
+
+        popover.behavior = .transient
+        popover.contentViewController = NSHostingController(rootView:
+            MenuView(openSettings: { [weak self] in self?.showSettings() })
                 .environmentObject(model)
-                .environment(\.locale, model.locale)
+        )
+
+        model.$airflowStatus
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.updateStatusItem() }
+            .store(in: &subscriptions)
+        model.$languagePreference
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.settingsWindow?.title = self?.model.localized(.settings) ?? "ControlMyMac"
+            }
+            .store(in: &subscriptions)
+    }
+
+    private func updateStatusItem() {
+        let image = model.menuIcon
+        image.isTemplate = true
+        statusItem?.button?.image = image
+        statusItem?.button?.setAccessibilityLabel("ControlMyMac")
+    }
+
+    @objc private func togglePopover(_ sender: Any?) {
+        guard let button = statusItem?.button else { return }
+        if popover.isShown {
+            popover.performClose(sender)
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         }
+    }
+
+    private func showSettings() {
+        popover.performClose(nil)
+        if settingsWindow == nil {
+            let controller = NSHostingController(rootView: SettingsView().environmentObject(model))
+            let window = NSWindow(contentViewController: controller)
+            window.identifier = Self.settingsWindowIdentifier
+            window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+            window.title = model.localized(.settings)
+            window.setContentSize(NSSize(width: 640, height: 520))
+            window.isReleasedWhenClosed = false
+            window.center()
+            settingsWindow = window
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        settingsWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
     }
 }
 

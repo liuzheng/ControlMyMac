@@ -2,7 +2,7 @@
 
 # ControlMyMac
 
-ControlMyMac 是 macOS 14+ 的菜单栏应用，用于管理当前登录用户的本地 Apache Airflow 服务。它只在 `http://127.0.0.1:50100` 提供服务，绝不绑定非 loopback 网络接口。应用仅在 LaunchAgent 已加载且本地 API 可访问时显示“已就绪”。
+ControlMyMac 是 macOS 12+ 的菜单栏应用，用于管理当前登录用户的本地 Apache Airflow 服务。它只在 `http://127.0.0.1:50100` 提供服务，绝不绑定非 loopback 网络接口。应用仅在 LaunchAgent 已加载且本地 API 可访问时显示“已就绪”。
 
 ## 组成
 
@@ -15,6 +15,8 @@ UI LaunchAgent       ~/Library/LaunchAgents/com.liuzheng.controlmymac.ui.plist�
 Airflow 是独立受管服务。菜单栏 App 只负责显示状态、控制 Airflow 生命周期、管理设置和查看日志。旧版网卡 Rule、蓝牙 Focus、Wi‑Fi、统一监听对象及旧 `config.json` 的监听字段均已移除且不会执行。
 
 ## 构建与安装
+
+最低要求为 macOS 12 Monterey、Swift 5.7（Xcode 14）。支持 Intel 和 Apple Silicon；菜单栏弹窗和设置窗口由 AppKit 承载，不依赖 macOS 13/14 的 SwiftUI API。
 
 构建必须以当前用户身份运行；不要使用 `sudo make`。安装与卸载会在需要时请求管理员权限。
 
@@ -51,18 +53,18 @@ PIP_INDEX_URL=https://pypi.org/simple make install
 
 安装、更新、服务重启与卸载都不会覆盖或删除用户 DAG、Airflow 状态、日志或用户级 Python 包。
 
-| 位置 | 用途 |
-|---|---|
-| `~/Library/Application Support/ControlMyMac/dags/` | 用户 DAG 的唯一受支持目录 |
-| `~/Library/Application Support/ControlMyMac/airflow/airflow.cfg` | 当前用户的自动生成 Airflow 配置（不编辑 App bundle 中的模板） |
-| `~/Library/Application Support/ControlMyMac/airflow/service-status.json` | 服务阶段和故障诊断 |
-| `~/Library/Application Support/ControlMyMac/airflow/simple-auth-passwords.json` | SimpleAuth 凭据，权限为 0600 |
-| `~/Library/Application Support/ControlMyMac/airflow/api-auth-jwt-secret.json` | Airflow 内部 execution API JWT 密钥，权限为 0600 |
-| `~/Library/Application Support/ControlMyMac/airflow/log-retention.json` | 日志保留设置，权限为 0600 |
-| `~/Library/Application Support/ControlMyMac/airflow/cleanup-status.json` | 最近一次日志清理结果 |
-| `~/Library/Logs/ControlMyMac/Airflow/{service,tasks,maintenance}/YYYY-MM-DD/` | 服务、任务及维护日志 |
-| `~/.controlmymac/python-packages/` | 内嵌 Python 使用的 Airflow 依赖 |
-| `~/.controlmymac/python-packages.status` | 依赖安装/验证状态 |
+| 位置                                                                            | 用途                                                          |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `~/Library/Application Support/ControlMyMac/dags/`                              | 用户 DAG 的唯一受支持目录                                     |
+| `~/Library/Application Support/ControlMyMac/airflow/airflow.cfg`                | 当前用户的自动生成 Airflow 配置（不编辑 App bundle 中的模板） |
+| `~/Library/Application Support/ControlMyMac/airflow/service-status.json`        | 服务阶段和故障诊断                                            |
+| `~/Library/Application Support/ControlMyMac/airflow/simple-auth-passwords.json` | SimpleAuth 凭据，权限为 0600                                  |
+| `~/Library/Application Support/ControlMyMac/airflow/api-auth-jwt-secret.json`   | Airflow 内部 execution API JWT 密钥，权限为 0600              |
+| `~/Library/Application Support/ControlMyMac/airflow/log-retention.json`         | 日志保留设置，权限为 0600                                     |
+| `~/Library/Application Support/ControlMyMac/airflow/cleanup-status.json`        | 最近一次日志清理结果                                          |
+| `~/Library/Logs/ControlMyMac/Airflow/{service,tasks,maintenance}/YYYY-MM-DD/`   | 服务、任务及维护日志                                          |
+| `~/.controlmymac/python-packages/`                                              | 内嵌 Python 使用的 Airflow 依赖                               |
+| `~/.controlmymac/python-packages.status`                                        | 依赖安装/验证状态                                             |
 
 日志保留期默认 30 天，必须为正整数。设置页保存后会立即清理；supervisor 也会在启动和日期变化时清理。只有严格早于“当前日期 − 保留天数”的日期目录会被删除。
 

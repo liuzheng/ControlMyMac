@@ -1,9 +1,9 @@
-// swift-tools-version:5.9
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
     name: "ControlMyMac",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS(.v12)],
     products: [
         .library(name: "ControlMyMacCore", targets: ["ControlMyMacCore"]),
         .executable(name: "ControlMyMac", targets: ["ControlMyMac"]),

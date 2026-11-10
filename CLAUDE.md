@@ -2,7 +2,7 @@
 
 ## 项目概要
 
-ControlMyMac 是 macOS 14+ 菜单栏工具，管理登录用户的本地 Apache Airflow 服务。Airflow LaunchAgent `com.liuzheng.controlmymac.airflow` 是唯一受管服务；应用状态仅取决于 `AirflowServiceStatus.phase`。
+ControlMyMac 是 macOS 12+ 菜单栏工具，最低工具链为 Swift 5.7（Xcode 14），管理登录用户的本地 Apache Airflow 服务。Airflow LaunchAgent `com.liuzheng.controlmymac.airflow` 是唯一受管服务；应用状态仅取决于 `AirflowServiceStatus.phase`。
 
 ## 常用命令
 
@@ -21,6 +21,7 @@ swift test
 
 - `ControlMyMacCore/AirflowService.swift` 定义 Airflow 的路径、工作目录、私有 SimpleAuth 凭据、日志保留、运行时验证、服务状态和 launchd 控制器。
 - `ControlMyMac` 是唯一可执行 target；其菜单栏和设置 UI 只显示并控制 Airflow。
+- 菜单栏和设置窗口通过 AppKit 的 `NSStatusItem` / `NSPopover` / `NSWindow` 承载 SwiftUI；不能直接引入 macOS 13/14 专用 API。
 - `Resources/airflow-supervisor.py` 使用 App 内置 Python 启动 Airflow 公共 CLI 组件，仅绑定 `127.0.0.1:50100`。
 - `scripts/install.sh` 安装 App、Airflow LaunchAgent 和 UI LaunchAgent；为升级兼容会清理旧 root daemon、listener helper 与其 plist，但不会安装新的监听服务。
 - 用户 Airflow 数据位于 `~/Library/Application Support/ControlMyMac/{dags,airflow}/`；日志在 `~/Library/Logs/ControlMyMac/Airflow/`；依赖在 `~/.controlmymac/python-packages/`。安装和卸载都不得删除这些用户数据。

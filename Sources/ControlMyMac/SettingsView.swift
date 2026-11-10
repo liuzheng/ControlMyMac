@@ -4,7 +4,6 @@ import ControlMyMacCore
 
 struct SettingsView: View {
     @EnvironmentObject var model: AppModel
-    @Environment(\.appearsActive) private var appearsActive
     @State private var airflowPasswordCopyFeedback = ""
 
     var body: some View {
@@ -27,8 +26,13 @@ struct SettingsView: View {
             .padding(12)
         }
         .frame(minWidth: 580, minHeight: 440)
-        .onChange(of: appearsActive, initial: true) { _, isActive in
-            if isActive {
+        .environment(\.locale, model.locale)
+        .onAppear {
+            airflowPasswordCopyFeedback = ""
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
+            if let window = notification.object as? NSWindow,
+               window.identifier == AppDelegate.settingsWindowIdentifier {
                 airflowPasswordCopyFeedback = ""
             }
         }
@@ -60,7 +64,7 @@ struct SettingsView: View {
                     Circle().fill(airflowColor).frame(width: 9, height: 9)
                     Text(model.airflowPhaseText)
                     Spacer()
-                    Text(AirflowPaths.endpoint.absoluteString).font(.caption).monospaced().foregroundStyle(.secondary)
+                    Text(AirflowPaths.endpoint.absoluteString).font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
                 }
                 Text(model.airflowStatus.detail).font(.caption)
                     .foregroundStyle(model.airflowStatus.phase == .failed ? .orange : .secondary)
@@ -94,7 +98,7 @@ struct SettingsView: View {
                     Text("\(model.localized(.recentCleanup))：\(cleanup.diagnostic)（\(cleanup.deletedItems) \(model.localized(.day))）")
                         .font(.caption).foregroundStyle(.secondary).lineLimit(2)
                 }
-                Text(model.airflowStatus.paths.logRoot.path).font(.caption2).monospaced().foregroundStyle(.secondary)
+                Text(model.airflowStatus.paths.logRoot.path).font(.system(.caption2, design: .monospaced)).foregroundStyle(.secondary)
             }
             .padding(6)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -124,15 +128,15 @@ struct SettingsView: View {
             Text(model.localized(.airflowCredentials)).font(.caption).foregroundStyle(.secondary)
             HStack(spacing: 8) {
                 Text(model.localized(.username))
-                Text(credentials.userName).font(.caption).monospaced()
+                Text(credentials.userName).font(.system(.caption, design: .monospaced))
                 Spacer()
             }
             HStack(spacing: 8) {
                 Text(model.localized(.password))
                 if model.airflowPasswordRevealed {
-                    Text(credentials.password).font(.caption).monospaced().textSelection(.enabled)
+                    Text(credentials.password).font(.system(.caption, design: .monospaced)).textSelection(.enabled)
                 } else {
-                    Text("••••••••••••").font(.caption).monospaced().foregroundStyle(.secondary)
+                    Text("••••••••••••").font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Button(model.airflowPasswordRevealed ? model.localized(.hidden) : model.localized(.show)) {

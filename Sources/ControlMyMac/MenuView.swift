@@ -3,6 +3,7 @@ import AppKit
 
 struct MenuView: View {
     @EnvironmentObject var model: AppModel
+    let openSettings: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -14,6 +15,7 @@ struct MenuView: View {
         }
         .padding(12)
         .frame(width: 360)
+        .environment(\.locale, model.locale)
     }
 
     private var serviceRow: some View {
@@ -60,7 +62,7 @@ struct MenuView: View {
                     .lineLimit(2).fixedSize(horizontal: false, vertical: true)
             }
             HStack {
-                SettingsLink { Text(model.localized(.settings)) }
+                Button(model.localized(.settings), action: openSettings)
                 Spacer()
                 Button(model.localized(.quit)) { NSApp.terminate(nil) }
             }
